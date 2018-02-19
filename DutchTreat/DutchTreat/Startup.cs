@@ -1,4 +1,5 @@
-﻿using DutchTreat.Data;
+﻿using AutoMapper;
+using DutchTreat.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -25,6 +26,8 @@ namespace DutchTreat
 
             services.AddDbContext<ProductContext>(cfg=> 
             cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString")));
+
+            services.AddAutoMapper();
 
             services.AddTransient<DbSeeder>();
             services.AddScoped<IProductRepository, ProductRepository>();
