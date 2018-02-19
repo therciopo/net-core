@@ -2,10 +2,10 @@
 using DutchTreat.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Swashbuckle.AspNetCore.Swagger;
 
 namespace DutchTreat
 {
@@ -31,6 +31,24 @@ namespace DutchTreat
 
             services.AddTransient<DbSeeder>();
             services.AddScoped<IProductRepository, ProductRepository>();
+
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1",
+                    new Info
+                    {
+                        Title = "Products API",
+                        Version = "v1",
+                        Description = "Products API",
+                        Contact = new Contact
+                        {
+                            Name = "Name",
+                            Url = "https://github.com/therciopo"
+                        }
+                    }
+                    );
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
