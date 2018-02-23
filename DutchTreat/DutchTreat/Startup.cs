@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using DutchTreat.Data;
+using DutchTreat.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -21,8 +22,11 @@ namespace DutchTreat
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc()
-                .AddJsonOptions(opt=> opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+            services.AddMvc(opt =>
+            {
+                opt.Filters.Add(typeof(ValidateModelFilter));
+            })
+            .AddJsonOptions(opt=> opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
             services.AddDbContext<ProductContext>(cfg=> 
             cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString")));
@@ -31,7 +35,6 @@ namespace DutchTreat
 
             services.AddTransient<DbSeeder>();
             services.AddScoped<IProductRepository, ProductRepository>();
-
 
             services.AddSwaggerGen(c =>
             {
@@ -57,21 +60,21 @@ namespace DutchTreat
             app.UseDefaultFiles();
             app.UseStaticFiles();
 
-            app.UseMvc();                
-
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
+            app.UseMvc();
             if(env.IsDevelopment())
             {
+                app.UseDeveloperExceptionPage();
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
                     var seeder = scope.ServiceProvider.GetService<DbSeeder>();
                     seeder.Seed();
                 }
             }
+            else
+            {
+                app.UseExceptionHandler();
+            }
+            app.UseExceptionMiddleware();
         }
     }
 }
