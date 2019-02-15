@@ -38,15 +38,16 @@ namespace DutchTreat.Controllers
         public async Task<IActionResult> Get(int orderid)
         {
             var order = await _orderRepository.GetOrderById(orderid);
-
-            var vm = _mapper.Map<IEnumerable<OrderItem>, IEnumerable<OrderItemViewModel>>(order.Items);
-
-            if(vm != null)
+            if (order != null)
             {
-                return Ok(vm);
+                var vm = _mapper.Map<IEnumerable<OrderItem>, IEnumerable<OrderItemViewModel>>(order.Items);
+
+                if(vm != null)
+                {
+                    return Ok(vm);
+                }
             }
             return NotFound();
-
         }
 
         [HttpGet("{id:int}")]
@@ -55,9 +56,12 @@ namespace DutchTreat.Controllers
             var order = await _orderRepository.GetOrderById(orderid);
             if (order != null)
             {
-                var item = await _orderItemRepository.GetOrderItemById(id);
-                var vm = _mapper.Map<OrderItem, OrderItemViewModel>(item);
-                return Ok(vm);
+                var item = order.Items.Where(x => x.Id.Equals(id)).FirstOrDefault();
+                if(item != null)
+                {
+                    var vm = _mapper.Map<OrderItem, OrderItemViewModel>(item);
+                    return Ok(vm);
+                }
             }
             return NotFound();
         }
