@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Threading.Tasks;
 
 namespace DutchTreat.Controllers
 {
@@ -18,11 +19,12 @@ namespace DutchTreat.Controllers
         }
 
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             try
             {
-                return Ok(_repository.GetAll());
+                var all = await _repository.GetAllProducts();
+                return Ok(all);
             }
             catch (Exception ex)
             {

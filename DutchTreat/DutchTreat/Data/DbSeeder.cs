@@ -29,22 +29,49 @@ namespace DutchTreat.Data
                 var products = JsonConvert.DeserializeObject<IEnumerable<Product>>(json);
                 _ctx.Products.AddRange(products);
 
-                var order = new Order()
+                var orders = new List<Order>()
                 {
-                    OrderDate = DateTime.Now,
-                    OrderNumber = "12345",
-                    Items = new List<OrderItem>()
+                    new Order()
                     {
-                        new OrderItem()
+                        OrderDate = DateTime.Now,
+                        OrderNumber = "12345",
+                        Items = new List<OrderItem>()
                         {
-                            Product = products.First(),
-                            Quantity = 5,
-                            UnitPrice = products.First().Price
+                            new OrderItem()
+                            {
+                                Id=1,
+                                Product = products.First(),
+                                Quantity = 5,
+                                UnitPrice = products.First().Price
+                            },
+                            new OrderItem()
+                            {
+                                Id=2,
+                                Product = products.ElementAt(2),
+                                Quantity = 2,
+                                UnitPrice = products.ElementAt(2).Price
+
+                            }
+                        }
+                    },
+                    new Order()
+                    {
+                        OrderDate = DateTime.Now,
+                        OrderNumber = "54321",
+                        Items = new List<OrderItem>()
+                        {
+                            new OrderItem()
+                            {
+                                Id=3,
+                                Product = products.Last(),
+                                Quantity = 1,
+                                UnitPrice = products.Last().Price
+                            }
                         }
                     }
                 };
 
-                _ctx.Orders.Add(order);
+                _ctx.Orders.AddRange(orders);
 
                 _ctx.SaveChanges();
             }

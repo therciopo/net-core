@@ -1,14 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using DutchTreat.Data.Entities;
 
 namespace DutchTreat.Data
 {
-    public interface IProductRepository
+    public interface IProductRepository : IRepositoryBase<Product>
     {
-        IEnumerable<Product> GetAll();
-        IEnumerable<Product> GetProductsByCategory(string category);
-        IEnumerable<Order> GetAllOrders();
-        Order GetOrderById(int id);
-        bool SaveChanges();
+        Task<IEnumerable<Product>> GetAllProducts();
+        Task<IEnumerable<Product>> GetProductsByCategory(string category);
+        bool SaveChanges();        
     }
 }

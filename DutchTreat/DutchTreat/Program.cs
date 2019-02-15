@@ -19,6 +19,11 @@ namespace DutchTreat
 
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
+            .ConfigureKestrel(o => 
+            {
+                // o.AllowSynchronousIO = false;
+                // o.Limits.MaxRequestBodySize = 500 * 1024; 
+             })
             .ConfigureAppConfiguration(SetupConfiguration)
                 .UseStartup<Startup>()
                 .Build();

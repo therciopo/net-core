@@ -28,13 +28,18 @@ namespace DutchTreat
             })
             .AddJsonOptions(opt=> opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
 
-            services.AddDbContext<ProductContext>(cfg=> 
-            cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString")));
+            services.AddDbContext<ProductContext>(cfg=>
+            {
+                //cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString")));
+                cfg.UseInMemoryDatabase("MyDatabase");
+            });
 
             services.AddAutoMapper();
 
             services.AddTransient<DbSeeder>();
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddScoped<IOrderRepository, OrderRepository>();
+            services.AddScoped<IOrderItemRepository, OrderItemRepository>();
 
             services.AddSwaggerGen(c =>
             {
@@ -57,8 +62,18 @@ namespace DutchTreat
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseSwagger();
+
             app.UseDefaultFiles();
             app.UseStaticFiles();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+            });
+
+
+            
 
             app.UseMvc();
             if(env.IsDevelopment())
@@ -72,7 +87,7 @@ namespace DutchTreat
             }
             else
             {
-                app.UseExceptionHandler();
+                app.UseExceptionHandler("/error");
             }
             app.UseExceptionMiddleware();
         }

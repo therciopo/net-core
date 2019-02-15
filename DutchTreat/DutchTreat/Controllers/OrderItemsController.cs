@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace DutchTreat.Controllers
 {
@@ -13,23 +14,31 @@ namespace DutchTreat.Controllers
     public class OrderItemsController : Controller
     {
         private readonly IProductRepository _repository;
+        private readonly IOrderRepository _orderRepository;
+
+        private readonly IOrderItemRepository _orderItemRepository;
         private readonly ILogger<OrderItemsController> _logger;
         private readonly IMapper _mapper;
 
 
-        public OrderItemsController(IProductRepository repository, 
+        public OrderItemsController(IProductRepository repository,
+            IOrderRepository orderRepository,
+            IOrderItemRepository orderItemRepository,
             ILogger<OrderItemsController> logger,
             IMapper mapper)
         {
             _repository = repository;
+            _orderRepository = orderRepository;
+            _orderItemRepository = orderItemRepository;
             _logger = logger;
             _mapper = mapper;
         }
 
         [HttpGet]
-        public IActionResult Get(int orderId)
+        public async Task<IActionResult> Get(int orderid)
         {
-            var order = _repository.GetOrderById(orderId);
+            var order = await _orderRepository.GetOrderById(orderid);
+
             var vm = _mapper.Map<IEnumerable<OrderItem>, IEnumerable<OrderItemViewModel>>(order.Items);
 
             if(vm != null)
@@ -40,18 +49,17 @@ namespace DutchTreat.Controllers
 
         }
 
-        [HttpGet("{id}")]
-        public IActionResult Get(int orderId, int id)
+        [HttpGet("{id:int}")]
+        public async Task<IActionResult> Get(int orderid, int id)
         {
-            var order = _repository.GetOrderById(orderId);
+            var order = await _orderRepository.GetOrderById(orderid);
             if (order != null)
             {
-                var item = order.Items.Where(x => x.Id == id).FirstOrDefault();
+                var item = await _orderItemRepository.GetOrderItemById(id);
                 var vm = _mapper.Map<OrderItem, OrderItemViewModel>(item);
                 return Ok(vm);
             }
             return NotFound();
         }
-
     }
 }

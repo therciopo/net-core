@@ -4,52 +4,44 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace DutchTreat.Data
 {
-    public class ProductRepository : IProductRepository
+    public class ProductRepository : RepositoryBase<Product>, IProductRepository
     {
         private readonly ProductContext _ctx;
         private readonly ILogger<ProductRepository> _logger;
 
         public ProductRepository(ProductContext ctx, ILogger<ProductRepository> logger)
+        : base(ctx)
         {
             _ctx = ctx;
             _logger = logger;
         }
-        public IEnumerable<Product> GetAll()
+        public async Task<IEnumerable<Product>> GetAllProducts()
         {
             _logger.LogInformation("GetAll was called");
 
-            return _ctx.Products
-                .OrderBy(p => p.Title)
-                .ToList();
+            var products =  await FindAllAsync();
+            return products.OrderBy(p => p.Title);                
         }
 
-        public IEnumerable<Product> GetProductsByCategory(string category)
+        public async Task<IEnumerable<Product>> GetProductsByCategory(string category)
         {
-            return _ctx.Products
+            return await _ctx.Products
                 .Where(p => p.Category == category)
                 .OrderBy(p => p.Title)
-                .ToList();
+                .ToListAsync();
         }
-
-        public IEnumerable<Order> GetAllOrders()
+        public async Task<Order> GetOrderById(int id)
         {
-            return _ctx.Orders
-                .Include(o => o.Items)
-                .ThenInclude(i => i.Product)
-                .ToList();
-        }
-
-        public Order GetOrderById(int id)
-        {
-            return _ctx.Orders
+            return await _ctx.Orders
                 .Include(o => o.Items)
                 .ThenInclude(i => i.Product)
                 .Where(o => o.Id == id)
-                .FirstOrDefault();
+                .FirstOrDefaultAsync();
         }
 
         public bool SaveChanges()
