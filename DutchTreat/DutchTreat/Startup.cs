@@ -70,14 +70,18 @@ namespace DutchTreat
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
-            });
-
-
-            
+            });   
 
             app.UseMvc();
             if(env.IsDevelopment())
             {
+                app.UseCors(builder =>
+                    builder
+                    .WithOrigins("http://localhost:4200/")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowAnyOrigin());            
+                            
                 app.UseDeveloperExceptionPage();
                 using (var scope = app.ApplicationServices.CreateScope())
                 {
