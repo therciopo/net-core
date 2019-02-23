@@ -3,6 +3,7 @@ using DutchTreat.Data;
 using DutchTreat.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,12 +23,6 @@ namespace DutchTreat
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddMvc(opt =>
-            {
-                opt.Filters.Add(typeof(ValidateModelFilter));
-            })
-            .AddJsonOptions(opt=> opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
-
             services.AddDbContext<ProductContext>(cfg=>
             {
                 //cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString")));
@@ -57,6 +52,15 @@ namespace DutchTreat
                     }
                     );
             });
+
+            services.AddCors();
+
+            services.AddMvc(opt =>
+            {
+                opt.Filters.Add(typeof(ValidateModelFilter));
+            })
+            .AddJsonOptions(opt=> opt.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore)
+            .SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -72,15 +76,14 @@ namespace DutchTreat
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });   
 
-            app.UseMvc();
             if(env.IsDevelopment())
             {
                 app.UseCors(builder =>
                     builder
-                    .WithOrigins("http://localhost:4200/")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowAnyOrigin());            
+                    .AllowAnyOrigin()
+                    .AllowCredentials());            
                             
                 app.UseDeveloperExceptionPage();
                 using (var scope = app.ApplicationServices.CreateScope())
@@ -94,6 +97,10 @@ namespace DutchTreat
                 app.UseExceptionHandler("/error");
             }
             app.UseExceptionMiddleware();
+
+            app.UseHttpsRedirection();
+            app.UseMvc();
+
         }
     }
 }
