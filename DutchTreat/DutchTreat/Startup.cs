@@ -25,8 +25,8 @@ namespace DutchTreat
         {
             services.AddDbContext<ProductContext>(cfg=>
             {
-                //cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString")));
-                cfg.UseInMemoryDatabase("MyDatabase");
+                cfg.UseSqlServer(_config.GetConnectionString("DutchCOnnectionString"));
+                //cfg.UseInMemoryDatabase("MyDatabase");
             });
 
             services.AddAutoMapper();
