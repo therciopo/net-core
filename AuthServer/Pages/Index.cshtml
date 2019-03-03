@@ -1,7 +1,18 @@
 ﻿@page
+@using Microsoft.Extensions.Options
+
 @model IndexModel
 @{
     ViewData["Title"] = "Home page";
+}
+
+@if (User.Identity.IsAuthenticated)
+{
+    <h1>Hi @User.Identity.Name</h1>
+}
+else
+{
+    <br />
 }
 
 <div class="text-center">
